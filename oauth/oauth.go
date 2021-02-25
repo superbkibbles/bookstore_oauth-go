@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/mercadolibre/golang-restclient/rest"
-	"github.com/superbkibbles/bookstore_oauth-go/oauth/errors"
+	"github.com/superbkibbles/bookstore_utils-go/rest_errors"
 )
 
 const (
@@ -67,7 +67,7 @@ func GetClientID(request *http.Request) int64 {
 	return clientID
 }
 
-func AuthentuicateRequest(request *http.Request) *errors.RestErr {
+func AuthentuicateRequest(request *http.Request) *rest_errors.RestErr {
 	if request == nil {
 		return nil
 	}
@@ -99,21 +99,21 @@ func cleanRequest(request *http.Request) {
 	request.Header.Del(heaederXCallerID)
 }
 
-func getAccessToken(accessTokenId string) (*accessToken, *errors.RestErr) {
+func getAccessToken(accessTokenId string) (*accessToken, *rest_errors.RestErr) {
 	response := oauthRestClient.Get(fmt.Sprintf("/oauth/access_token/%s", accessTokenId))
 	if response == nil || response.Response == nil {
-		return nil, errors.NewInternalServerErr("invalid restClient response when trying to get access token")
+		return nil, rest_errors.NewInternalServerErr("invalid restClient response when trying to get access token", nil)
 	}
 	if response.StatusCode > 299 {
-		var restErr errors.RestErr
+		var restErr rest_errors.RestErr
 		if err := json.Unmarshal(response.Bytes(), &restErr); err != nil {
-			return nil, errors.NewInternalServerErr("Invalid error interface when trying to get access token")
+			return nil, rest_errors.NewInternalServerErr("Invalid error interface when trying to get access token", nil)
 		}
 		return nil, &restErr
 	}
 	var at accessToken
 	if err := json.Unmarshal(response.Bytes(), &at); err != nil {
-		return nil, errors.NewInternalServerErr("error while trying to unmarshal access token response")
+		return nil, rest_errors.NewInternalServerErr("error while trying to unmarshal access token response", nil)
 	}
 	return &at, nil
 }
