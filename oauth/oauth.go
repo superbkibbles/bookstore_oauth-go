@@ -17,7 +17,6 @@ const (
 	headerXClientID  = "X-Client-Id"
 	heaederXCallerID = "X-Caller-Id"
 	paramAccessToken = "access_token"
-	test             = "test"
 )
 
 var (
